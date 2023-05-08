@@ -1,5 +1,6 @@
 package hello.jdbc.repository;
 
+import com.zaxxer.hikari.HikariDataSource;
 import hello.jdbc.connection.ConnectionConst.*;
 import hello.jdbc.domain.Member;
 import lombok.extern.slf4j.Slf4j;
@@ -17,18 +18,27 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @Slf4j
 class MemberRepositoryV1Test {
 
-    MemberRepositoryV1 memberRepositoryV1;
+    MemberRepositoryV1 repository;
 
     @BeforeEach
     void beforeEach() {
         // 기본 DriverManager - 항상 새로운 커넥션을 획득
-        DriverManagerDataSource datasou = new DriverManagerDataSource(URL, USERNAME, PASSWORD);
+        //DriverManagerDataSource dataSource = new DriverManagerDataSource(URL, USERNAME, PASSWORD);
 
+        // 커넥션 풀링 - 같은 커넥션 재사용 가능
+        HikariDataSource dataSource = new HikariDataSource();
+        dataSource.setJdbcUrl(URL);
+        dataSource.setUsername(USERNAME);
+        dataSource.setPassword(PASSWORD);
+        // 기본값: 10
+        //dataSource.setMaximumPoolSize(10);
+
+        repository = new MemberRepositoryV1(dataSource);
     }
 
 
     @Test
-    void crud() throws SQLException {
+    void crud() throws SQLException, InterruptedException {
         Member member = new Member("memberV0",10000);
         repository.save(member);
 
@@ -47,5 +57,6 @@ class MemberRepositoryV1Test {
         assertThatThrownBy(() -> repository.findById(member.getMemberId()))
                 .isInstanceOf(NoSuchElementException.class);
 
+        Thread.sleep(1000);
     }
 }
