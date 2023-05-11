@@ -33,6 +33,7 @@ class MemberServiceV3_1Test {
     void before () {
         DriverManagerDataSource dataSource = new DriverManagerDataSource(URL, USERNAME, PASSWORD);
         memberRepository = new MemberRepositoryV3(dataSource);
+        // 커넥션 생셩 위해 dataSource를 트랜잭션 매니저에게 넘겨줘야 함
         PlatformTransactionManager transactionManager = new DataSourceTransactionManager(dataSource);
         memberService = new MemberServiceV3_1(transactionManager, memberRepository);
     }
