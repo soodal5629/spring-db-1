@@ -3,9 +3,7 @@ package hello.jdbc.service;
 import hello.jdbc.domain.Member;
 import hello.jdbc.repository.MemberRepositoryV3;
 import lombok.extern.slf4j.Slf4j;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.aop.support.AopUtils;
@@ -25,12 +23,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * 트랜잭션 - @Transactional AOP
+ * 트랜잭션 - DataSource, transactionManager 자동 등록
  */
 
 @Slf4j
 @SpringBootTest // 스프링 띄워서 스프링 빈 등록하고 의존관계도 주입해줌
-class MemberServiceV3_3Test {
+class MemberServiceV3_4Test {
     public static final String MEMBER_A = "memberA";
     public static final String MEMBER_B = "memberB";
     public static final String MEMBER_EX = "ex";
@@ -42,22 +40,31 @@ class MemberServiceV3_3Test {
 
     @TestConfiguration
     static class TestConfig {
+        private final DataSource dataSource;
+
+        public TestConfig(DataSource dataSource) {
+            // 스프링 컨테이너에 등록된 DataSource 의존관계 주입
+            this.dataSource = dataSource;
+        }
         // 스프링 빈 등록
+        /*
         @Bean
         DataSource dataSource() {
             return new DriverManagerDataSource(URL, USERNAME, PASSWORD);
-        }
+        }*/
 
-        @Bean
+        /*
+        //@Bean
         // 스프링이 제공하는 트랜잭션 AOP는 스프링 빈에 등록된 트랜잭션 매니저를 찾아서 사용하기 때문에
         // 트랜잭션 매니저를 스프링빈으로 등록해줘야 한다.
         PlatformTransactionManager transactionManager() {
             return new DataSourceTransactionManager(dataSource());
         }
+        */
 
         @Bean
         MemberRepositoryV3 memberRepositoryV3() {
-            return new MemberRepositoryV3(dataSource());
+            return new MemberRepositoryV3(dataSource);
         }
 
         @Bean
