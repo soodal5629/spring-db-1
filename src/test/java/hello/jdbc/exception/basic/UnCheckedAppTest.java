@@ -1,17 +1,30 @@
 package hello.jdbc.exception.basic;
 
+import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.net.ConnectException;
 import java.sql.SQLException;
 
+@Slf4j
 public class UnCheckedAppTest {
     @Test
     void unChecked() {
         Controller controller = new Controller();
         Assertions.assertThatThrownBy(controller :: request)
                 .isInstanceOf(Exception.class);
+    }
+
+    @Test
+    void printEx() {
+        Controller controller = new Controller();
+        try {
+            controller.request();
+        } catch(Exception e) {
+            // e.printStackTrace(); -> 별로 좋지 않음
+            log.info("ex", e);
+        }
     }
 
     static class Controller {
@@ -60,6 +73,7 @@ public class UnCheckedAppTest {
     }
 
     static class RuntimeSQLException extends RuntimeException {
+        // 예외를 전환할 때는 다음과 같이 꼭!! 기존 예외를 포함해야 함
         public RuntimeSQLException(Throwable cause) {
             super(cause);
         }
